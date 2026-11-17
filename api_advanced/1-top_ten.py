@@ -5,15 +5,16 @@ import requests
 
 def top_ten(subreddit):
     """Prints the top 10 hot post titles, or None if invalid."""
-    url = "https://old.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) "
-               "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0"}
-    params = {"limit": 10}
-    response = requests.get(url, headers=headers, params=params,
-                            allow_redirects=False)
-    if response.status_code != 200:
-        print(response.status_code)
-        return
-    posts = response.json().get("data", {}).get("children", [])
-    for post in posts:
-        print(post.get("data", {}).get("title"))
+    hosts = ["https://www.reddit.com/r/{}/hot.json",
+             "https://www.reddit.com/r/{}.json",
+             "https://api.reddit.com/r/{}/hot",
+             "https://old.reddit.com/r/{}/hot.json",
+             "https://www.reddit.com/r/{}/hot/.json"]
+    agents = ["linux:alu.api_advanced:v1.0 (by /u/ikariuki)",
+              "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"]
+    for host in hosts:
+        for agent in agents:
+            r = requests.get(host.format(subreddit),
+                             headers={"User-Agent": agent},
+                             params={"limit": 10}, allow_redirects=False)
+            print(host[8:20], agent[:7], r.status_code)
